@@ -22,6 +22,7 @@ ansible----------------------switch
      controller     compute1   compute2     compute3  compute4   compute5
      
 controller节点安装组件如下：
+
    - ntp
    
    - mariadb
@@ -47,6 +48,7 @@ controller节点安装组件如下：
    - flavor
         
 compute计算节点安装组件如下： 
+
    - ntp-compute
    
    - nova-compute
@@ -70,11 +72,15 @@ swift存储节点安装组件如下：
  请参照ansible官方文档
  
 【关联ssh秘钥】
+
  ssh-keygen
+ 
  ssh-copy-id root@controller 
+ 
  ...
  
 【配置变量】
+
  编辑hosts_common：根据部署规划填写主机ip 此处[all:var]请保持不变
  
  编辑hosts_ocata： 根据部署规划填写主机ip
