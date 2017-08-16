@@ -1,9 +1,13 @@
 # openstack_ocata_ansible
+
 For install openstack ocata on ubuntu 16.04.2 with ansible2.3.2.0 （neutron use opensvswitch 2.6.2）
+
 使用ansible 2.3.2.0 在ubunut 16.04.2 64位系统上安装 openstack ocata ，其中neutron网络使用openvswitch 2.6.2
+
 注：此版本为在线安装版本，安装过程中需要下载依赖包及相应的软件包
 
 部署拓扑 ：
+
 ansible----------------------switch
                                 |
                                 |
@@ -16,24 +20,39 @@ ansible----------------------switch
          |              |           |           |         |        |
          |              |           |           |         |        |
      controller     compute1   compute2     compute3  compute4   compute5
+     
 controller节点安装组件如下：
    - ntp
+   
    - mariadb
+   
    - rabbitmq
+   
    - memcache
+   
    - shade
+   
    - keystone
+   
    - glance
+   
    - nova
+   
    - neutron
+   
    - dashboard
+   
    - swift
+   
    - flavor
         
 compute计算节点安装组件如下： 
    - ntp-compute
+   
    - nova-compute
+   
    - neutron-compute
+   
    - open-falcon  （小米开源的平台监控软件此处安装的是agent客户端，可以选择不安装）
    
 swift存储节点安装组件如下：
