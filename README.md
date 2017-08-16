@@ -4,7 +4,10 @@ For install openstack ocata on ubuntu 16.04.2 with ansible2.3.2.0 （neutron use
 
 使用ansible 2.3.2.0 在ubunut 16.04.2 64位系统上安装 openstack ocata ，其中neutron网络使用openvswitch 2.6.2
 
-注：此版本为在线安装版本，安装过程中需要下载依赖包及相应的软件包
+注1：此版本为在线安装版本，安装过程中需要下载依赖包及相应的软件包
+
+注2：此版本支持自定义所有主机名、openstack组件密码，自动修改主机hosts
+
 
 部署拓扑 ：
 
