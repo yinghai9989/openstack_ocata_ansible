@@ -1,0 +1,154 @@
+---
+
+
+- name: Install wift-storage packages
+  apt: name={{ item }} state=installed force=yes
+  with_items:
+   - xfsprogs
+   - rsync
+   - swift
+   - swift-account
+   - swift-container
+   - swift-object
+  tags:
+     - swift-storage
+
+- name: Ensure /srv/node is ok
+  file: 
+     path: /srv/node/ 
+     state: directory
+  tags:
+     - swift-storage
+
+- name: Ensure /srv/node/sdc is ok
+  file: 
+     path: /srv/node/{{ swift_dev_name }} 
+     state: directory 
+     owner: swift 
+     group: swift
+  tags:
+     - swift-storage
+
+- name: Parted the disk
+  parted:
+    device: /dev/{{ swift_dev_name }}
+    number: 1
+    flags: [ lvm ]
+    state: present
+  tags:
+     - swift-storage
+  
+
+- name: Format the {{ swift_dev_path }} device as XFS
+  filesystem:
+    fstype: xfs 
+    dev: "{{ swift_dev_path }}"
+    force: yes
+  tags:
+     - swift-storage
+
+- name: Edit the /etc/fstab file and add the following
+  mount: 
+    path: "/srv/node/{{ swift_dev_name }}"
+    src: "{{ swift_dev_path }}"
+    fstype: xfs 
+    opts: noatime,nodiratime,nobarrier,logbufs=8
+    dump: 0 
+    passno: 2
+    state: present
+  tags:
+     - swift-storage
+
+- name: Mount device
+  shell: mount /srv/node/{{ swift_dev_name }}
+  tags:
+     - swift-storage
+
+- name: Confiugre rsyncd
+  template: src=rsyncd.j2 dest=/etc/rsyncd.conf
+  tags:
+     - swift-storage
+
+- name: Ensure rsyncd is enabled
+  copy: src=rsync dest=/etc/default/rsync
+  notify: restart rsync
+  changed_when: true
+  tags:
+     - swift-storage
+
+- name: Configure swift/account-server
+  template: src=account-server.j2 dest=/etc/swift/account-server.conf
+  tags:
+     - swift-storage
+
+- name: Configure swift/container-server
+  template: src=container-server.j2 dest=/etc/swift/container-server.conf
+  tags:
+     - swift-storage
+
+- name: Configure swift/object-server
+  template: src=object-server.j2  dest=/etc/swift/object-server.conf
+  tags:
+     - swift-storage
+
+- name: Ensure proper ownership of /srv/node
+  file: 
+    path: /srv/node 
+    owner: swift 
+    group: swift
+    recurse: yes
+  tags:
+     - swift-storage
+
+- name: Ensure /var/cache/swift is ok
+  file: 
+    path: /var/cache/swift 
+    state: directory 
+    owner: root 
+    group: swift 
+    mode: 775
+  tags:
+     - swift-storage
+
+- name: put the *.ring.gz files on all storage servers
+  copy: src=fetch/{{ item }}.ring.gz dest=/etc/swift/{{item}}.ring.gz owner=swift group=swift mode=0640
+  register: new_rings
+  with_items:
+    - account
+    - object
+    - container
+  tags:
+     - swift-storage
+
+
+- name: Configure swift
+  copy: src=swift.conf dest=/etc/swift/swift.conf
+  tags:
+     - swift-storage
+
+- name: Ensure /etc/swift is ok
+  file:
+    path: /etc/swift
+    state: directory
+    owner: root
+    group: swift
+    recurse: yes  
+  tags:
+     - swift-storage
+
+
+- meta: flush_handlers
+
+
+- name: restart swift-storage node services
+  command: swift-init all stop
+  when: new_rings.changed
+  ignore_errors: True
+  tags:
+     - swift-storage
+ 
+- name: restart swift-storage node services
+  command: swift-init all start
+  when: new_rings.changed
+  tags:
+     - swift-storage

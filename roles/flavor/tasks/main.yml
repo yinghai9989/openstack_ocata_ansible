@@ -1,0 +1,67 @@
+---
+
+
+- name: "Create tiny flavor"
+  os_nova_flavor:
+    state: present
+    name: m0.tiny
+    ram: 512
+    vcpus: 1
+    disk: 1
+    ephemeral: 0
+    flavorid: 0
+  environment: "{{ admin_env }}"
+  tags:
+     - flavor
+
+- name: "Create small flavor"
+  os_nova_flavor:
+    state: present
+    name: m1.small
+    ram: 2048
+    vcpus: 1
+    disk: 20
+    ephemeral: 0
+    flavorid: 1
+  environment: "{{ admin_env }}"
+  tags:
+     - flavor
+
+- name: "Create medium flavor"
+  os_nova_flavor:
+    state: present
+    name: m2.medium
+    ram: 4096
+    vcpus: 2
+    disk: 20
+    ephemeral: 0
+    flavorid: 2
+  environment: "{{ admin_env }}"
+  tags:
+     - flavor
+
+- name: "Create large flavor"
+  os_nova_flavor:
+    state: present
+    name: m3.large
+    ram: 8192
+    vcpus: 4
+    disk: 20
+    ephemeral: 0
+    flavorid: 3
+  environment: "{{ admin_env }}"
+  tags:
+     - flavor 
+
+- name: "Create xlarge flavor"
+  os_nova_flavor:
+    state: present
+    name: m4.xlarge
+    ram: 16384
+    vcpus: 8
+    disk: 20
+    ephemeral: 0
+    flavorid: 4
+  environment: "{{ admin_env }}"
+  tags:
+     - flavor 

@@ -1,0 +1,5 @@
+
+
+ansible-playbook -i hosts_common deploy_common.yml
+
+ansible-playbook -i hosts_ocata deploy_ocata.yml

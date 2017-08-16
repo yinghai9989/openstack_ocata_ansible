@@ -1,0 +1,7 @@
+---
+
+- name: Mange Compute Node Hostname
+  hostname: name=compute{{ ansible_default_ipv4.address.split('.')[-1] }}
+  tags:
+    - hostname
+

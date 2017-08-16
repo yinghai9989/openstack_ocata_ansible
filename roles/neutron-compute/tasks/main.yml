@@ -1,0 +1,64 @@
+---
+
+
+- name: ADD br_netfilter 
+  modprobe:
+    name: br_netfilter
+    state: present
+  tags:
+     - neutron-compute
+
+ 
+- name: add br_netfilter to modules files
+  shell: echo "br_netfilter" >> /etc/modules
+  tags:
+     - neutron-compute
+
+
+- name: add system config
+  blockinfile:
+    path: /etc/sysctl.conf
+    block: |
+      net.ipv4.conf.all.rp_filter=0
+      net.ipv4.conf.default.rp_filter=0
+      net.bridge.bridge-nf-call-iptables=1
+      net.bridge.bridge-nf-call-ip6tables=1
+  tags:
+     - neutron-compute
+
+
+- name: update sysctl
+  shell: sysctl -p
+  tags:
+     - neutron-compute
+
+
+- name: Install neutron compute packages
+  apt: name={{ item }} state=installed force=yes
+  with_items:
+   - neutron-plugin-ml2 
+   - neutron-openvswitch-agent
+  tags:
+     - neutron-compute
+
+
+- name: Configure neutron
+  template: src=neutron.j2 dest=/etc/neutron/neutron.conf
+  tags:
+     - neutron-compute
+
+
+- name: Configure ml2 conf
+  template: src=ml2_conf.j2 dest=/etc/neutron/plugins/ml2/ml2_conf.ini
+  tags:
+     - neutron-compute
+
+
+- name: Configure openvswitch_agent
+  template: src=openvswitch_agent.j2 dest=/etc/neutron/plugins/ml2/openvswitch_agent.ini
+  notify:
+   - restart openvswitch-switch
+   - restart neutron-openvswitch-agent
+  changed_when: true
+  tags:
+     - neutron-compute

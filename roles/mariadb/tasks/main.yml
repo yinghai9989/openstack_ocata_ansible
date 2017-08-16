@@ -1,0 +1,46 @@
+---
+
+
+- name: Install MarriaDB Server
+  apt: name={{ item }} state=installed force=yes
+  with_items:
+   - mariadb-server
+   - python-pymysql
+   - python-mysqldb
+   - python3-pip
+   - python3-mysqldb
+  tags:
+     - mariadb
+
+- name: Copy my.cnf
+  template: src=my.j2 dest=/etc/mysql/mariadb.conf.d/99-openstack.cnf
+  notify:
+   - restart mysql
+  tags:
+     - mariadb
+
+- name: Deletes anonymous MySQL server user for localhost
+  mysql_user: 
+    name: ''
+    host: localhost
+    state: absent
+  tags:
+     - mariadb
+
+- name: Set root Password
+  mysql_user: name=root host={{ item }} password={{ mysql_root_db_pass }}
+  with_items:
+    - localhost
+    - 127.0.0.1
+    - ::1
+  tags:
+     - mariadb
+
+- name: Removes the MySQL test database
+  mysql_db: 
+    name: test 
+    state: absent
+  tags:
+     - mariadb
+
+- meta: flush_handlers

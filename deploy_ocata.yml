@@ -1,0 +1,31 @@
+---
+
+- hosts: controller
+  roles:
+   - ntp
+   - mariadb
+   - rabbitmq
+   - memcache
+   - shade
+   - keystone
+   - glance
+   - nova
+   - neutron
+   - dashboard
+   - swift
+   - flavor
+
+- hosts: computes
+  roles:
+   - ntp-compute
+   - nova-compute
+   - neutron-compute
+
+
+- hosts: swift-storage
+  roles:
+   - ntp-compute
+   - swift-storage
+
+
+

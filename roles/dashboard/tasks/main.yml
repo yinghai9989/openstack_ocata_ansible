@@ -1,0 +1,25 @@
+---
+
+
+- name: Install dashboard packages
+  apt: name={{ item }} state=installed force=yes
+  with_items:
+   - openstack-dashboard
+  tags:
+     - horizon
+
+- name: Configure dashboard
+  template: src=dashboard.j2 dest=/etc/openstack-dashboard/local_settings.py
+  notify:
+   - reload apache
+  changed_when: true
+  tags:
+     - horizon
+
+- name: Change openstack dashboard secret_key attribute
+  file: path=/var/lib/openstack-dashboard/secret_key owner=www-data group=www-data
+  tags:
+     - horizon
+
+
+

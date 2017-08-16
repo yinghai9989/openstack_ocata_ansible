@@ -1,0 +1,26 @@
+---
+
+- name: Mange Controller Node Hostname
+  hostname: name={{ controller_hostname }}
+  tags:
+    - hostname
+
+
+
+#- hosts: computes
+#  remote_user: root
+#  tasks:
+#  - name: Show Compute Node Hostname
+#    shell: hostname
+#  - name: Show IP
+#    command: ip a
+#  - hostname: name=compute{{ ansible_default_ipv4.address.split('.')[-1] }}
+#  tags:
+#    - install
+#- hostname:
+#    hosts: "{{ controller }}" 
+#    name: "{{ item }}"
+#    with_items:
+#      - "{{ controller_hostname }}"
+#  tags:
+#    - install

@@ -1,0 +1,125 @@
+IP_RANGS: 172.171.0.0/20
+
+RABBIT_PASS: stack2017
+rabbit_hostname: controller81
+rabbit_userid: openstack
+rabbit_pass: stack2017
+
+
+mysql_root_db_pass: stack2017
+
+controller_hostname: controller81
+controller_ip: 172.171.8.1
+
+MYSQL_BIND_ADDRESS: 172.171.8.1
+mysql_hostname: controller81
+memcached_host: controller81
+
+keystone_admin_token: stack2017
+keystone_hostname: controller81
+keystone_protocol: http
+keystone_admin_port: 35357
+keystone_db_name: keystone
+keystone_db_user: keystone
+keystone_db_pass: stack2017
+
+glance_hostname: controller81
+glance_user: glance
+glance_user_pass: stack2017
+glance_db_name: glance
+glance_db_user: glance
+glance_db_pass: stack2017
+
+
+cinder_hostname: controller81
+cinder_db_name: cinder
+cinder_db_user: cinder
+cinder_db_pass: stack2017
+cinder_volume_dev: /dev/sdb
+
+nova_hostname: controller81
+nova_db_name: nova
+nova_api_db_name: nova_api
+nova_db_user: nova
+nova_db_pass: stack2017
+
+placement_hostname: controller81
+placement_user: placement
+placement_pass: stack2017
+
+
+neutron_hostname: controller81
+neutron_db_name: neutron
+neutron_db_user: neutron
+neutron_db_pass: stack2017
+
+heat_hostname: controller81
+heat_db_name: heat
+heat_db_user: heat
+heat_db_pass: stack2017
+stack_domain_admin: heat_domain_admin
+heat_domain_pass: stack2017
+
+dashboard_hostname: controller81
+
+mng: ens160
+data: ens192
+external: ens224
+
+
+swift_user: swift
+swift_dev_name: sdc
+swift_dev_path: /dev/sdc
+swift_dev_size: 50
+swift_storage_node1: 172.171.8.4
+swift_storage_node2: 172.171.8.5
+swift_hostname: controller81
+swift_db_user: swift
+swift_db_passwd: stack2017
+
+openfalcon_ip: 172.171.8.1
+
+admin_pass: stack2017
+demo_pass: stack2017
+glance_pass: stack2017
+cinder_pass: stack2017
+nova_pass: stack2017
+neutron_pass: stack2017
+swift_pass: stack2017
+sahara_pass: stack2017
+heat_pass: stack2017
+
+keystone_services:
+  - { name: keystone, service_type: identity, description: "Openstack Identity" }
+
+
+
+keystone_endpoints:
+  - service_name: keystone
+    public_url: "http://keystone_hostname:5000/v2.0"
+    internal_url: "http://keytone_hostname:5000/v2.0"
+    admin_url: "http://keystone_hostname:35357/v2.0"
+
+
+admin_env:
+   OS_USERNAME: "admin"
+   OS_PASSWORD: "{{ keystone_admin_token }}"
+   OS_PROJECT_NAME: "admin"
+   OS_USER_DOMAIN_NAME: "Default"
+   OS_PROJECT_DOMAIN_NAME: "Default"
+   OS_AUTH_URL: "http://{{ keystone_hostname }}:35357/v3"
+   OS_IDENTITY_API_VERSION: "3"
+
+node_hosts:
+ "127.0.0.1      localhost\n
+ 172.171.8.1    controller81\n
+ 172.171.8.2    compute2\n
+ 172.171.8.3    compute3\n
+ 172.171.8.4    compute4\n
+ 172.171.8.5    compute5\n
+   
+
+ # The following lines are desirable for IPv6 capable hosts\n
+ ::1     localhost ip6-localhost ip6-loopback\n
+ ff02::1 ip6-allnodes\n
+ ff02::2 ip6-allrouters\n"

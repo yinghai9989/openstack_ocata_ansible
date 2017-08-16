@@ -1,0 +1,92 @@
+---
+
+- name: Create glance database
+  mysql_db: name={{ glance_db_name }} state=present
+  tags:
+     - glance
+
+- name: Create glance user in database
+  mysql_user: name={{ glance_db_user  }} password={{ glance_db_pass  }} host={{ item }} priv=*.*:ALL,GRANT state=present
+  with_items:
+    - "localhost"
+    - "%"
+  tags:
+     - glance
+
+- name: Create the glance user
+  os_user: name={{ glance_user }}  password={{ glance_user_pass }} domain=default state=present
+  environment: "{{ admin_env }}" 
+  tags:
+     - glance
+
+- name: Add the admin role to the glance user and service project
+  os_user_role: user={{ glance_user }} role=admin project=service state=present
+  environment: "{{ admin_env }}"
+  tags:
+     - glance
+
+- name: Create the glance service entity
+  os_keystone_service:
+     state: present
+     name: glance
+     service_type: image
+     description: OpenStack Image Service
+  environment: "{{ admin_env }}"
+  tags:
+     - glance
+
+- name: Create the Image service API endpoints
+  shell: openstack endpoint create --region RegionOne image {{ item }} http://{{ glance_hostname }}:9292
+  with_items:
+      - public
+      - internal
+      - admin
+  environment: "{{ admin_env }}"
+  tags:
+     - glance
+
+- name: Install glance packages
+  apt: name={{ item }} state=installed force=yes
+  with_items:
+   - glance
+   - python-glanceclient
+  tags:
+     - glance
+
+- name: Configure glance-api
+  template: src=glance-api.j2 dest=/etc/glance/glance-api.conf
+  notify:
+   - restart glance-api
+  changed_when: true
+  tags:
+     - glance
+
+- name: Configure glance-registry
+  template: src=glance-registry.j2 dest=/etc/glance/glance-registry.conf
+  notify: restart glance-registry
+  changed_when: true
+  tags:
+     - glance
+ 
+- meta: flush_handlers
+  tags:
+     - glance
+
+- name: Sync glance database
+  shell: su -s /bin/sh -c "glance-manage db_sync" glance
+  tags:
+     - glance
+
+- name : Update cirros image to Controller Node
+  copy: src=cirros-0.3.4-x86_64-disk.img dest=/root/cirros-0.3.4-x86_64-disk.img
+  tags:
+     - glance
+
+- name: Add cirros image
+  os_image: name="cirros 0.3.4" container_format=bare state=present
+            filename=/root/cirros-0.3.4-x86_64-disk.img
+            disk_format=qcow2
+            is_public=yes
+  environment: "{{ admin_env }}"
+  tags:
+     - glance

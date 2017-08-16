@@ -1,0 +1,107 @@
+---
+
+
+
+- name: Create keystone db
+  mysql_db: name={{ keystone_db_name }} state=present
+  tags:
+     - keystone
+
+- name: Create keystone  user
+  mysql_user: name={{ keystone_db_user }} password={{ keystone_db_pass }} host={{ item }} priv=*.*:ALL,GRANT state=present
+  with_items:
+    - "localhost"
+    - "%"
+  tags:
+     - keystone
+
+- name: Install keystone packages
+  apt: name={{ item }} state=installed force=yes
+  with_items:
+    - keystone
+  tags:
+     - keystone  
+
+- name: Copy keystone.conf file
+  template: src=keystone.j2 dest=/etc/keystone/keystone.conf
+  tags:
+     - keystone
+
+- name: Syncing keystone database
+  shell: su -s /bin/sh -c "keystone-manage db_sync" keystone
+  tags:
+     - keystone
+
+- name: Initialize Fernet key repositories
+  shell: keystone-manage {{ item }} --keystone-user keystone --keystone-group keystone
+  with_items:
+    - fernet_setup
+    - credential_setup
+  tags:
+     - keystone
+
+- name: Bootstrap the Identity service
+  command: |
+     keystone-manage bootstrap \
+     --bootstrap-password {{ keystone_admin_token }} \
+     --bootstrap-admin-url http://{{ keystone_hostname }}:35357/v3 \
+     --bootstrap-public-url http://{{ keystone_hostname }}:5000/v3 \
+     --bootstrap-internal-url http://{{ keystone_hostname }}:5000/v3\
+     --bootstrap-region-id RegionOne
+  tags:
+    - keystone
+
+- name: Configure the Apache HTTP server
+  template: src=apache2.j2 dest=/etc/apache2/apache2.conf
+  notify:
+   - restart apache2
+  tags:
+     - keystone
+
+- name: Remove the default SQLite database on Controller Node
+  command: rm -f /var/lib/keystone/keystone.db
+  tags:
+     - keystone
+
+- name: Creating the admin-openrc  file in the /root directory
+  template: src=admin-openrc.j2 dest=/root/admin-openrc owner=root group=root mode=0755
+  tags:
+     - keystone
+ 
+- name: Creating the demo-openrc  file in the /root directory
+  template: src=demo-openrc.j2 dest=/root/demo-openrc owner=root group=root mode=0755
+  tags:
+     - keystone
+
+######=============================================================================================
+- name: Create OS service project
+  os_project: domain=default description="Service Project" state=present
+              name=service
+  environment: "{{ admin_env }}"
+  tags:
+     - keystone
+
+- name: Create demo project
+  os_project: domain=default description="Demo Project" state=present
+              name=demo
+  environment: "{{ admin_env }}"
+  tags:
+     - keystone
+
+- name: Create demo user
+  os_user: name=demo password={{ keystone_admin_token }} domain=default
+  environment: "{{ admin_env }}"
+  tags:
+     - keystone
+
+- name: Create user role
+  os_keystone_role: name=user state=present
+  environment: "{{ admin_env }}"
+  tags:
+     - keystone
+
+- name: Add the user role to the demo project and user
+  os_user_role: user=demo role=user project=demo state=present
+  environment: "{{ admin_env }}"
+  tags:
+     - keystone

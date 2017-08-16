@@ -1,0 +1,22 @@
+---
+
+- name: Install nova compute packages
+  apt: name={{ item }} state=installed force=yes
+  with_items:
+    - nova-compute
+    - libguestfs-tools
+  tags:
+     - nova-compute
+
+- name: Configure nova
+  template: src=nova.j2 dest=/etc/nova/nova.conf
+  notify:
+   - restart nova-compute
+  tags:
+     - nova-compute
+ 
+
+
+
+
+

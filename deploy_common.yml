@@ -1,0 +1,13 @@
+---
+
+- hosts: all
+  roles:
+   - common
+
+- hosts: controller
+  roles:
+   - hostname
+
+- hosts: computes
+  roles:
+   - hostname-compute

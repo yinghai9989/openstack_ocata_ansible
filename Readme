@@ -1,0 +1,79 @@
+更新说明：
+v1.3.1 201710810
+ 
+1、支持修改变量配置的密码修改
+2、支持python3 环境安装依赖 python2 环境安装openstack ocata版本
+3、修正部分依赖包错误问题
+
+遗留问题：
+/etc/hosts 中配文件与实际主机名有部分出入 ，需要手动调整，下一版本解决
+
+v1.2 20170809
+
+1、新增ocata版本apt-get本地离线安装文件及模块
+2、解决python3 环境ansible-playbook 执行报错问题
+3、简化变量配置
+4、新增控制节点和计算节点修改主机名功能
+5、修正python-shade pip 本地安装问题
+6、新增监控agent组件open-falcon 自动安装到计算节点
+7、其他优化
+
+v1.1.2 20170801
+ 
+1、更新tags标注
+
+
+v1.1  20170731
+
+1、增加变量解决计算节点ip地址与网卡的对应关系，解决templates中jinja2 文件变量问题
+
+
+
+v1.0  20170728
+1、完成脚本框架编写
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++openstack ocata install on ubuntu 16.04.2 use ansible 2.3.1 使用说明++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+#本版本基于ubuntu 16.04.2 安装openstack ocata 版本 
+#使用本地源 ，将已近做安装源文件拷贝到每一台主机/opt/目录，并解压到/opt/ocata目录下
+
+#支持安装的组件有：  
+#   控制节点
+#   - rabbitmq
+#   - mariadb
+#   - keystone
+#   - glance
+#   - cinder
+#   - nova
+#   - neutron
+#   - dashboard
+#   - swift
+#   - heat
+#  
+# 计算节点
+#   - nova-compute
+#   - cinder-volume
+#   - neutron-compute
+#存储节点
+#   - swift-storage
+#支持修改控制节点主机名
+#cinder服务安装在控制节点的sdb上
+#swift服务安装在最后2个计算节点的sdb和sdc上  
+
+自行安装需要根据实际情况修改以下文件
+1、hosts 修改 控制节点和计算节点的IP地址
+   vi /roles/common/templates/hosts.j2
+2、修改控制节点主机名
+   
+3、修改group_vars/all 对应的配置信息：
+
+4、修改neutron  ml2_conf.j2 中[ovs] 部分对应的网卡名称
+
+5、修改/roles/nova-compute/templates/nova.j2   中 [vnc]  中em1字段
+
+    vncserver_proxyclient_address = {{ ansible_em1.ipv4.address }}
+    novncproxy_base_url = http://{{ ansible_em1.ipv4.address }}:6080/vnc_auto.html
+6、 swift存储节点需要预先将磁盘分区格式化

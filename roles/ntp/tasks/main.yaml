@@ -1,0 +1,16 @@
+---
+- name: Install NTP Server On Controller Node
+  apt:
+    name: chrony
+    state: present
+  tags:
+    - ntp
+
+- name: Configuring chrony
+  template: src=chrony.j2  dest=/etc/chrony/chrony.conf
+  notify:
+   - restart chrony
+  changed_when: true
+  tags:
+    - ntp
+

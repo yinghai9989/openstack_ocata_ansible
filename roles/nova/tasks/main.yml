@@ -1,0 +1,130 @@
+---
+
+- name: Create nova database
+  mysql_db: name={{ item }} state=present
+  with_items:
+    - nova_api
+    - nova
+    - nova_cell0
+  tags:
+     - nova
+
+- name: Create nova user in database (nova,nova_api,nova_cell0)
+  mysql_user: name={{ nova_db_user }} password={{ nova_db_pass }} host={{ item }}  priv=*.*:ALL,GRANT state=present
+  with_items:
+    - "localhost"
+    - "%"
+  tags:
+    - nova
+
+- name:  Create the nova user
+  os_user: name={{ nova_db_user }} password={{ nova_db_pass }} domain=default state=present
+  environment: "{{ admin_env }}"
+  tags:
+     - nova
+
+- name: Add the admin role to the nova user
+  os_user_role: user=nova role=admin project=service state=present
+  environment: "{{ admin_env }}"
+  tags:
+     - nova
+
+- name: Create the nova service entity
+  os_keystone_service:
+     state: present
+     name: nova
+     service_type: compute
+     description: OpenStack Image Service
+  environment: "{{ admin_env }}"
+  tags:
+     - nova
+
+- name: Create the Compute API service endpoints 
+  shell: openstack endpoint create --region RegionOne compute {{ item }} http://{{ nova_hostname }}:8774/v2.1
+  with_items:
+      - public
+      - internal
+      - admin
+  environment: "{{ admin_env }}"
+  tags:
+     - nova
+
+- name: Create a Placement service user 
+  os_user: name={{ placement_user }} password={{ placement_pass }} domain=default state=present
+  environment: "{{ admin_env }}"
+  tags:
+     - nova
+
+- name: Add the Placement user to the service project with the admin role
+  os_user_role: user=placement role=admin project=service state=present
+  environment: "{{ admin_env }}"
+  tags:
+     - nova
+
+- name: Create the Placement API entry in the service catalog
+  os_keystone_service:
+     state: present
+     name: placement
+     service_type: placement
+     description: Placement API
+  environment: "{{ admin_env }}"
+  tags:
+     - nova
+
+- name: Create the Placement API service endpoints
+  shell: openstack endpoint create --region RegionOne placement {{ item }} http://{{ nova_hostname }}:8778
+  with_items:
+      - public
+      - internal
+      - admin
+  environment: "{{ admin_env }}"
+  tags:
+     - nova
+
+
+- name: Install nova controller packages
+  apt: name={{ item }} state=installed force=yes
+  with_items:
+   - nova-api 
+   - nova-conductor 
+   - nova-consoleauth 
+   - nova-novncproxy 
+   - nova-scheduler 
+   - nova-placement-api
+  tags:
+     - nova
+
+- name: Configure nova
+  template: src=nova.j2 dest=/etc/nova/nova.conf
+  notify: 
+   - restart nova-api
+   - restart nova-consoleauth
+   - restart nova-scheduler
+   - restart nova-conductor 
+   - restart nova-novncproxy
+  changed_when: true
+  tags:
+     - nova 
+
+- name: Populate the nova-api database
+  shell: su -s /bin/sh -c "nova-manage api_db sync" nova
+  tags:
+     - nova
+
+- name: Register the cell0 database
+  shell: su -s /bin/sh -c "nova-manage cell_v2 map_cell0" nova
+  tags:
+     - nova
+
+- name: Create the cell1 cell
+  shell: su -s /bin/sh -c "nova-manage cell_v2 create_cell --name=cell1 --verbose" nova
+  tags:
+     - nova
+
+- name: Populate the nova database
+  shell: su -s /bin/sh -c "nova-manage db sync" nova
+  tags:
+     - nova
+
+- meta: flush_handlers
+

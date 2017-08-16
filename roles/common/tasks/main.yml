@@ -1,0 +1,68 @@
+---
+
+
+- name: Configuring source.list
+  template: src=sources.list dest=/etc/apt/sources.list
+  tags:
+     - common
+
+- name: Update apt cache
+  apt: update_cache=yes
+  tags:
+     - common
+
+- name: Update all packages to the latest version
+  apt: upgrade=dist
+  tags:
+     - common
+
+- name: install python2.7
+  apt: name={{ item }} state=latest force=yes
+  with_items:
+    - python2.7
+    - python-simplejson
+    - python-apt
+    - python3-apt
+    - python-apt-common
+  tags:
+     - common
+
+- name: Install software-properties-common
+  command: apt install software-properties-common
+  tags:
+     - common
+
+- name: Add apt repo cloud-archive ocata
+  command: add-apt-repository cloud-archive:ocata
+  tags:
+    - common
+
+- name: Update apt cache
+  apt: update_cache=yes
+  tags:
+     - common
+
+- name: Update all packages to the latest version
+  apt: upgrade=dist
+  tags:
+     - common
+
+
+- name: Create the hosts file for all machines
+  template: src=hosts.j2 dest=/etc/hosts
+  tags:
+     - common
+
+- name: Install python-openstackclient
+  apt: name=python-openstackclient state=latest force=yes
+  tags:
+     - common
+
+- name: Install software
+  apt: name={{ item }} state=latest force=yes
+  with_items:
+    - iftop
+    - htop
+    - lrzsz
+  tags:
+     - common

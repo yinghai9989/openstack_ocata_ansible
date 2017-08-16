@@ -1,0 +1,17 @@
+---
+
+
+- name: Install keystone packages
+  apt: name={{ item }} state=installed force=yes
+  with_items:
+   - memcached
+   - python-memcache
+  tags:
+     - memcache
+
+- name: Configure memcached
+  template: src=memcached.j2 dest=/etc/memcached.conf
+  notify:
+   - restart memcached
+  tags:
+     - memcache
