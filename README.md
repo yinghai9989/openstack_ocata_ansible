@@ -37,37 +37,59 @@ compute计算节点安装组件如下：
    - open-falcon  （小米开源的平台监控软件此处安装的是agent客户端，可以选择不安装）
    
 swift存储节点安装组件如下：
+
    - ntp-compute
+   
    - swift-storage （在此处安装swift存储节点安装在compute4和compute5上的sdc磁盘上，当然也可以独立安装到单纯的swift存储节点上）
 
 部署步骤：
+
 【ansible安装】---【关联ssh秘钥】---【配置变量】---【开始安装openstack ocata】
 
 【ansible安装】
+
  请参照ansible官方文档
+ 
 【关联ssh秘钥】
  ssh-keygen
  ssh-copy-id root@controller 
  ...
+ 
 【配置变量】
  编辑hosts_common：根据部署规划填写主机ip 此处[all:var]请保持不变
+ 
  编辑hosts_ocata： 根据部署规划填写主机ip
+ 
  编辑group_vars/all： 根据实际情况填写
+ 
 【开始安装openstack ocata】
+
  执行 bash cmd_deploy
-【FAQ】
+ 
+ 【FAQ】
+ 
  1、脚本可以分步安装
+ 
     依照先安装common 基础组件部分，然后在安装openstac ocata服务组件
+    
  1.1【安装common 基础组件部分】
+ 
     ansible-playbook -i hosts_common deploy_common.yml
+    
     如果在需要查看安装过程中输出的详细信息可以执行如下命令:
+    
     ansible-playbook -i hosts_common deploy_common.yml -vvv
+    
  1.2【安装openstac ocata服务组件】
+ 
     ansible-playbook -i hosts_ocata deploy_ocata.yml
+    
     如果在需要查看安装过程中输出的详细信息可以执行如下命令:
+    
     ansible-playbook -i hosts_ocata deploy_ocata.yml -vvv
    
 2、其他问题
+
    如有其他问题请联系:chen1893@163.com 或者chen1893@gmail.com
 
 
