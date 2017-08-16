@@ -55,13 +55,13 @@ compute计算节点安装组件如下：
    
    - neutron-compute
    
-   - open-falcon  （小米开源的平台监控软件此处安装的是agent客户端，可以选择不安装）
-   
 swift存储节点安装组件如下：
 
    - ntp-compute
    
-   - swift-storage （在此处安装swift存储节点安装在compute4和compute5上的sdc磁盘上，当然也可以独立安装到单纯的swift存储节点上）
+   - swift-storage 
+   
+    （在此处安装swift存储节点安装在compute4和compute5上的sdc磁盘上，当然也可以独立安装到单纯的swift存储节点上）
 
 部署步骤：
 
