@@ -68,39 +68,40 @@ swift存储节点安装组件如下：
 
 部署步骤：
 
-【ansible安装】---【关联ssh秘钥】---【配置变量】---【开始安装openstack ocata】
+  【ansible安装】---【关联ssh秘钥】---【配置变量】---【开始安装openstack ocata】
 
-【ansible安装】
 
- 请参照ansible官方文档
- 
-【关联ssh秘钥】
+1、【ansible安装】
 
- ssh-keygen
+   请参照ansible官方文档
  
- ssh-copy-id root@controller 
- 
- ...
- 
-【配置变量】
+2、【关联ssh秘钥】
 
- 编辑hosts_common：根据部署规划填写主机ip 此处[all:var]请保持不变
+   ssh-keygen
  
- 编辑hosts_ocata： 根据部署规划填写主机ip
+   ssh-copy-id root@controller 
  
- 编辑group_vars/all： 根据实际情况填写
+   ...
  
-【开始安装openstack ocata】
+3、【配置变量】
 
- 执行 bash cmd_deploy
+   编辑hosts_common：根据部署规划填写主机ip 此处[all:var]请保持不变
  
- 【FAQ】
+   编辑hosts_ocata： 根据部署规划填写主机ip
  
- 1、脚本可以分步安装
+   编辑group_vars/all： 根据实际情况填写
+ 
+4、【开始安装openstack ocata】
+
+   执行 bash cmd_deploy
+ 
+ 5、【FAQ】
+ 
+ 5.1、脚本可以分步安装
  
     依照先安装common 基础组件部分，然后在安装openstac ocata服务组件
     
- 1.1【安装common 基础组件部分】
+ 5.1.1【安装common 基础组件部分】
  
     ansible-playbook -i hosts_common deploy_common.yml
     
@@ -108,7 +109,7 @@ swift存储节点安装组件如下：
     
     ansible-playbook -i hosts_common deploy_common.yml -vvv
     
- 1.2【安装openstac ocata服务组件】
+ 5.1.2【安装openstac ocata服务组件】
  
     ansible-playbook -i hosts_ocata deploy_ocata.yml
     
@@ -116,7 +117,7 @@ swift存储节点安装组件如下：
     
     ansible-playbook -i hosts_ocata deploy_ocata.yml -vvv
    
-2、其他问题
+5.2、其他问题
 
    如有其他问题请联系:chen1893@163.com 或者chen1893@gmail.com
 
