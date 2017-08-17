@@ -10,18 +10,18 @@ For install openstack ocata on ubuntu 16.04.2 with ansible2.3.2.0 （neutron use
 
 
 部署拓扑 ：
-
-###ansible----------------------switch
+###
+###    ansible------------------switch
 ###                                |
 ###                                |
 ###                                |
 ###                                |
 ###                                |
 ###         ----------------------------------------------------------
-###         |              |           |           |         |        |
-###         |              |           |           |         |        |
-###         |              |           |           |         |        |
-###         |              |           |           |         |        |
+###         |  ###            |           |           |         |        |
+###         |  ###            |           |           |         |        |
+###         |  ###            |           |           |         |        |
+###         |  ###            |           |           |         |        |
 ###     controller     compute1   compute2     compute3  compute4   compute5
 ###     
 controller节点安装组件如下：
